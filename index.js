@@ -111,6 +111,30 @@ async function run() {
       res.send(result)
     })
 
+
+    app.put('/user/update/:email', async(req, res)=>{
+      const senderMail = req.params.email;
+      const user = req.body;
+      const {role, email} = user;
+      console.log(role, email);
+      
+      const query = {email:email}
+      const options = {upsert:true}
+      const updateDoc = {
+        $set:{
+          role,
+          timestamp: Date.now()
+        }
+      }
+
+      const result = await usersCollection.updateOne(query, updateDoc, options)
+      res.send(result)
+
+    })
+
+
+
+
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 })
     console.log(
