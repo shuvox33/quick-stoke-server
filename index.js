@@ -49,6 +49,7 @@ async function run() {
   try {
 
     const usersCollection = client.db('quickStock').collection('users')
+    const storeCollection = client.db('quickStock').collection('store')
 
 
     // auth related api
@@ -98,6 +99,15 @@ async function run() {
         },
         options
       )
+      res.send(result)
+    })
+
+
+    // create store
+    app.post('/create-store', async(req, res)=>{
+      const storeInfo = req.body;
+      console.log(storeInfo);
+      const result = await storeCollection.insertOne(storeInfo);
       res.send(result)
     })
 
