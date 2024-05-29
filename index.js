@@ -111,7 +111,7 @@ async function run() {
       res.send(result)
     })
 
-
+    //update role
     app.put('/user/update/:email', async(req, res)=>{
       const senderMail = req.params.email;
       const user = req.body;
@@ -130,6 +130,13 @@ async function run() {
       const result = await usersCollection.updateOne(query, updateDoc, options)
       res.send(result)
 
+    })
+
+    //get role
+    app.get('/user/:email', async(req, res)=>{
+      const email = req.params.email;
+      const result = await usersCollection.findOne({email});
+      res.send(result);
     })
 
 
