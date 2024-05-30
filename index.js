@@ -139,13 +139,32 @@ async function run() {
       const result = await usersCollection.findOne({email});
       res.send(result);
     })
+    // get shop id 
+    app.get('/user/owner-info/:email', async(req, res)=>{
+      const email = req.params.email;
+      const result = await usersCollection.findOne({email});
+      res.send(result)
+    })
+    //get store info
+    app.get('/user/store-info/:email', async(req, res)=>{
+      const email = req.params.email;
+      const result = await storeCollection.findOne({ownerEmail:email});
+      res.send(result)
+    })
 
     //dashboard related api
 
     //manager related api
-    app.get('/is-empty/:email', async(req, res)=>{
+    app.get('/total-product/:email', async(req, res)=>{
       const email = req.params.email;
-      console.log('shop owner',email);
+      const count = await productCollection.find({ownerEmail:email}).toArray();
+      res.send({count:count.length})
+    })
+    //add product
+    app.post('/add-product', async(req, res)=>{
+      const productInfo = req.body;
+      const result = await productCollection.insertOne(productInfo);
+      res.send(result);
     })
 
 
