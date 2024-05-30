@@ -50,6 +50,7 @@ async function run() {
 
     const usersCollection = client.db('quickStock').collection('users')
     const storeCollection = client.db('quickStock').collection('store')
+    const productCollection = client.db('quickStock').collection('product')
 
 
     // auth related api
@@ -139,7 +140,13 @@ async function run() {
       res.send(result);
     })
 
+    //dashboard related api
 
+    //manager related api
+    app.get('/is-empty/:email', async(req, res)=>{
+      const email = req.params.email;
+      console.log('shop owner',email);
+    })
 
 
     // Send a ping to confirm a successful connection
