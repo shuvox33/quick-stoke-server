@@ -139,8 +139,8 @@ async function run() {
       const result = await usersCollection.findOne({email});
       res.send(result);
     })
-    // get shop id 
-    app.get('/user/owner-info/:email', async(req, res)=>{
+    // get owner info 
+    app.get('/user-info/:email', async(req, res)=>{
       const email = req.params.email;
       const result = await usersCollection.findOne({email});
       res.send(result)
@@ -155,6 +155,8 @@ async function run() {
     //dashboard related api
 
     //manager related api
+
+    //total product
     app.get('/total-product/:email', async(req, res)=>{
       const email = req.params.email;
       const count = await productCollection.find({ownerEmail:email}).toArray();
@@ -166,6 +168,21 @@ async function run() {
       const result = await productCollection.insertOne(productInfo);
       res.send(result);
     })
+    // reduce limit
+    app.patch('/reduce-limit/:email', async(req,res)=>{
+      const email = req.params.email;
+      const limit = req.body;
+      console.log(email, limit);
+      const query={ownerEmail:email}
+      const updateDoc={
+        $inc:{
+          limit:-1
+        }
+      }
+      const result = await storeCollection.updateOne(query,updateDoc)
+      res.send(result)
+    })
+
 
 
     // Send a ping to confirm a successful connection
