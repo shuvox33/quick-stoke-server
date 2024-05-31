@@ -77,7 +77,7 @@ async function run() {
           secure: process.env.NODE_ENV === 'production',
           sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         }).send({ success: true })
-        
+
         console.log('Logout successful')
       } catch (err) {
         res.status(500).send(err)
@@ -103,26 +103,17 @@ async function run() {
       res.send(result)
     })
 
-
-    // create store
-    app.post('/create-store', async(req, res)=>{
-      const storeInfo = req.body;
-      console.log(storeInfo);
-      const result = await storeCollection.insertOne(storeInfo);
-      res.send(result)
-    })
-
     //update role
-    app.put('/user/update/:email', async(req, res)=>{
+    app.put('/user/update/:email', async (req, res) => {
       const senderMail = req.params.email;
       const user = req.body;
-      const {role, email} = user;
+      const { role, email } = user;
       console.log(role, email);
-      
-      const query = {email:email}
-      const options = {upsert:true}
+
+      const query = { email: email }
+      const options = { upsert: true }
       const updateDoc = {
-        $set:{
+        $set: {
           role,
           timestamp: Date.now()
         }
@@ -134,54 +125,71 @@ async function run() {
     })
 
     //get role
-    app.get('/user/:email', async(req, res)=>{
+    app.get('/user/:email', async (req, res) => {
       const email = req.params.email;
-      const result = await usersCollection.findOne({email});
+      const result = await usersCollection.findOne({ email });
       res.send(result);
     })
     // get owner info 
-    app.get('/user-info/:email', async(req, res)=>{
+    app.get('/user-info/:email', async (req, res) => {
       const email = req.params.email;
-      const result = await usersCollection.findOne({email});
+      const result = await usersCollection.findOne({ email });
+      res.send(result)
+    })
+
+
+    //store //
+
+    // create store
+    app.post('/create-store', async (req, res) => {
+      const storeInfo = req.body;
+      console.log(storeInfo);
+      const result = await storeCollection.insertOne(storeInfo);
       res.send(result)
     })
     //get store info
-    app.get('/user/store-info/:email', async(req, res)=>{
+    app.get('/store-info/:email', async (req, res) => {
       const email = req.params.email;
-      const result = await storeCollection.findOne({ownerEmail:email});
+      const result = await storeCollection.findOne({ ownerEmail: email });
+      res.send(result)
+    })
+    // reduce limit
+    app.patch('/reduce-limit/:email', async (req, res) => {
+      const email = req.params.email;
+      const limit = req.body;
+      console.log(email, limit);
+      const query = { ownerEmail: email }
+      const updateDoc = {
+        $inc: {
+          limit: -1
+        }
+      }
+      const result = await storeCollection.updateOne(query, updateDoc)
       res.send(result)
     })
 
-    //dashboard related api
 
-    //manager related api
+    //product related api
 
     //total product
-    app.get('/total-product/:email', async(req, res)=>{
+    app.get('/total-product/:email', async (req, res) => {
       const email = req.params.email;
-      const count = await productCollection.find({ownerEmail:email}).toArray();
-      res.send({count:count.length})
+      const count = await productCollection.find({ ownerEmail: email }).toArray();
+      res.send({ count: count.length })
     })
     //add product
-    app.post('/add-product', async(req, res)=>{
+    app.post('/add-product', async (req, res) => {
       const productInfo = req.body;
       const result = await productCollection.insertOne(productInfo);
       res.send(result);
     })
-    // reduce limit
-    app.patch('/reduce-limit/:email', async(req,res)=>{
+    //get added product
+    app.get('/added-product/:email', async(req, res)=>{
       const email = req.params.email;
-      const limit = req.body;
-      console.log(email, limit);
-      const query={ownerEmail:email}
-      const updateDoc={
-        $inc:{
-          limit:-1
-        }
-      }
-      const result = await storeCollection.updateOne(query,updateDoc)
+      const result = await productCollection.find({ownerEmail:email}).toArray();
       res.send(result)
     })
+
 
 
 
