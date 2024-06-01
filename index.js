@@ -3,7 +3,7 @@ const app = express()
 require('dotenv').config()
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-const { MongoClient, ServerApiVersion } = require('mongodb')
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const jwt = require('jsonwebtoken')
 const morgan = require('morgan')
 const port = process.env.PORT || 8000
@@ -187,6 +187,27 @@ async function run() {
     app.get('/added-product/:email', async(req, res)=>{
       const email = req.params.email;
       const result = await productCollection.find({ownerEmail:email}).toArray();
+      res.send(result)
+    })
+    //update product
+    app.patch('/update-product/:id', async(req, res)=>{
+      const id = req.params.id;
+      const product = req.body;
+      // console.log(id, product);
+      const query = {_id:new ObjectId(id)};
+      const updateDoc={
+        $set:{
+          productName: product?.productName,
+          quantity: product?.quantity,
+          description: product?.description,
+          location: product?.location,
+          productCost: product?.productCost,
+          profitMargin: product?.profitMargin,
+          discount: product?.discount,
+          image: product?.image,
+        }
+      }
+      const result = await productCollection.updateOne(query,updateDoc);
       res.send(result)
     })
 
