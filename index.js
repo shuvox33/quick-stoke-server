@@ -156,12 +156,22 @@ async function run() {
     // reduce limit
     app.patch('/reduce-limit/:email', async (req, res) => {
       const email = req.params.email;
-      const limit = req.body;
-      console.log(email, limit);
       const query = { ownerEmail: email }
       const updateDoc = {
         $inc: {
           limit: -1
+        }
+      }
+      const result = await storeCollection.updateOne(query, updateDoc)
+      res.send(result)
+    })
+    //increase limit
+    app.patch('/increase-limit/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { ownerEmail: email }
+      const updateDoc = {
+        $inc: {
+          limit: 1
         }
       }
       const result = await storeCollection.updateOne(query, updateDoc)
@@ -209,6 +219,13 @@ async function run() {
       }
       const result = await productCollection.updateOne(query,updateDoc);
       res.send(result)
+    })
+    //delete product
+    app.delete('/delete-product/:id',async (req, res) =>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = productCollection.deleteOne(query)
+      res.send(result);
     })
 
 
