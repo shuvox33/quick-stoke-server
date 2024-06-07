@@ -194,38 +194,45 @@ async function run() {
       res.send(result);
     })
     //get added product
-    app.get('/added-product/:email', async(req, res)=>{
+    app.get('/added-product/:email', async (req, res) => {
       const email = req.params.email;
-      const result = await productCollection.find({ownerEmail:email}).toArray();
+      const result = await productCollection.find({ ownerEmail: email }).toArray();
       res.send(result)
     })
     //update product
-    app.patch('/update-product/:id', async(req, res)=>{
-      const id = req.params.id;
-      const product = req.body;
-      // console.log(id, product);
-      const query = {_id:new ObjectId(id)};
-      const updateDoc={
-        $set:{
-          productName: product?.productName,
-          quantity: product?.quantity,
-          description: product?.description,
-          location: product?.location,
-          productCost: product?.productCost,
-          profitMargin: product?.profitMargin,
-          discount: product?.discount,
-          image: product?.image,
-        }
+    app.put('/update-product/:id', async (req, res) => {
+      try {
+        const id = req.params.id;
+        const product = req.body;
+        product?._id && delete product._id ;
+
+        const result = await productCollection.findOneAndUpdate(
+          { _id: new ObjectId(id) },
+          { $set: product },
+          { returnOriginal: false }
+        );
+
+        res.send(result)
+      } catch (error) {
+        console.error(error)
       }
-      const result = await productCollection.updateOne(query,updateDoc);
-      res.send(result)
     })
     //delete product
-    app.delete('/delete-product/:id',async (req, res) =>{
+    app.delete('/delete-product/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)};
+      const query = { _id: new ObjectId(id) };
       const result = productCollection.deleteOne(query)
       res.send(result);
+    })
+
+
+
+    //sales
+    app.post('/sales', async (req, res) => {
+      const product = req.body;
+      console.log(product);
+
+      res.send(true)
     })
 
 
