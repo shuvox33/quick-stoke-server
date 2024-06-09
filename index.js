@@ -51,6 +51,7 @@ async function run() {
     const usersCollection = client.db('quickStock').collection('users')
     const storeCollection = client.db('quickStock').collection('store')
     const productCollection = client.db('quickStock').collection('product')
+    const salesCollection = client.db('quickStock').collection('sales')
 
 
     // auth related api
@@ -229,13 +230,11 @@ async function run() {
 
     //sales
     app.post('/sales', async (req, res) => {
+      // product.data = new Date();
       const product = req.body;
-      console.log(product);
-
-      res.send(true)
+      const result = await salesCollection.insertOne(product)
+      res.send(result)
     })
-
-
 
 
     // Send a ping to confirm a successful connection
