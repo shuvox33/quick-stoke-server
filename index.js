@@ -7,6 +7,8 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const jwt = require('jsonwebtoken')
 const morgan = require('morgan')
 const port = process.env.PORT || 8000
+const stripe = require("stripe")(process.env.STRIPE_SECRETE_KEY)
+
 
 // middleware
 const corsOptions = {
@@ -53,6 +55,27 @@ async function run() {
     const productCollection = client.db('quickStock').collection('product')
     const salesCollection = client.db('quickStock').collection('sales')
 
+
+
+
+    //payment intent
+    app.post('/create-payment-intent', async (req, res) => {
+      const price = req.body.price;
+      console.log(price);
+      const priceCent = parseFloat(price) * 100;
+      if(!price || priceCent < 1) return ;
+
+      const {client_secret} = await stripe.paymentIntents.create({
+        amount: priceCent,
+        currency: "usd",
+        // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
+        automatic_payment_methods: {
+          enabled: true,
+        },
+      })
+      console.log(client_secret);
+      res.send({clientSecret : client_secret})
+    })
 
     // auth related api
     app.post('/jwt', async (req, res) => {
@@ -205,7 +228,7 @@ async function run() {
       try {
         const id = req.params.id;
         const product = req.body;
-        product?._id && delete product._id ;
+        product?._id && delete product._id;
 
         const result = await productCollection.findOneAndUpdate(
           { _id: new ObjectId(id) },
