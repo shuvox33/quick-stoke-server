@@ -54,6 +54,7 @@ async function run() {
     const storeCollection = client.db('quickStock').collection('store')
     const productCollection = client.db('quickStock').collection('product')
     const salesCollection = client.db('quickStock').collection('sales')
+    const subscriptionCollection = client.db('quickStock').collection('subscription')
 
 
 
@@ -61,7 +62,6 @@ async function run() {
     //payment intent
     app.post('/create-payment-intent', async (req, res) => {
       const price = req.body.price;
-      console.log(price);
       const priceCent = parseFloat(price) * 100;
       if(!price || priceCent < 1) return ;
 
@@ -72,10 +72,18 @@ async function run() {
         automatic_payment_methods: {
           enabled: true,
         },
-      })
-      console.log(client_secret);
+      });
       res.send({clientSecret : client_secret})
     })
+
+    //store subscription information
+    app.post('/subscription', async(req, res)=>{
+      const info = req.body;
+      const result = await subscriptionCollection.insertOne(info)
+      res.send(result)
+    })
+
+
 
     // auth related api
     app.post('/jwt', async (req, res) => {
