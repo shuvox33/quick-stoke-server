@@ -210,6 +210,21 @@ async function run() {
       res.send(result)
     })
 
+    //apply subscription
+    app.patch('/apply-subscription/:email', async (req, res)=>{
+      const email = req.params.email;
+      const limit = req.body.limit;
+      console.log(limit);
+      const query = {ownerEmail: email}
+      const updateDoc = {
+        $set:{
+          limit:limit
+        }
+      }
+      const result = await storeCollection.updateOne(query, updateDoc)
+      res.send(result)
+    })
+
 
     //product related api
 
